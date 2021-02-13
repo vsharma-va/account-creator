@@ -10,11 +10,16 @@ def openFile():
     return pins
 
 
-def writeFile(data):
-    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'a') as file:
-        file.write('\n' + data)
-        
-    file.close()
+def writeFile(data = '', balance = 0):
+    if data != '':
+        with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'a') as file:
+            file.write('\n' + data)
+        file.close()
+
+    if balance != 0:
+        with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\bankbalance.txt", 'a') as file:
+            file.write('\n' + str(balance))
+        file.close()
 
 
 def removePunctuation(pins):
@@ -39,7 +44,7 @@ def cleanListofPins():
 
 def greetUser():
     registeredPins = cleanListofPins()
-    userInDataBase: bool = True
+    userInDataBase: bool = False
     lenRegisteredPins = len(registeredPins)
     elementIndex = 0
     chances = 3
@@ -52,24 +57,28 @@ press 2 for no\n'''))
     except TypeError:
         print("Entered a string")
     if registered == 1:
-        for i in range(chances):    
-            userName = input("Enter your registered name: ")
-            userPin = input("Enter your registered Pin: ")
-            for z in registeredPins:
-                search = userName + ' ' + userPin
-                if search == z:
-                    print("Welcome")
-                    userInDataBase = True
-                    break
-                elif search != z and elementIndex != lenRegisteredPins - 1:
-                    elementIndex += 1
-                    userInDataBase = False
-                elif elementIndex == lenRegisteredPins - 1:
-                    print("Your input doesn't match with our records " +
-                    " Either you are not registered with us or you have " +
-                    " Entered the wrong information " + " Please try again ")
-                    elementIndex = 0
-                    chances += 1
+        for i in range(chances):
+            if not userInDataBase:
+
+                userName = input("Enter your registered name: ")
+                userPin = input("Enter your registered Pin: ")
+                for z in registeredPins:
+                    search = userName + ' ' + userPin
+                    if search == z:
+                        print("Welcome")
+                        userInDataBase = True
+                        break
+                    elif search != z and elementIndex != lenRegisteredPins - 1:
+                        elementIndex += 1
+                        userInDataBase = False
+                    elif elementIndex == lenRegisteredPins - 1:
+                        print("Your input doesn't match with our records " +
+                        " Either you are not registered with us or you have " +
+                        " Entered the wrong information " + " Please try again ")
+                        elementIndex = 0
+                        chances += 1
+            else:
+                break
     elif registered == 2:
         print("would you like to register?")
         userInDataBase = False
@@ -159,6 +168,7 @@ def newAccountDeposit():
             balance = moneyDeposit
             correctDeposit = True
             break
+    return balance
 
 
 def main():
@@ -170,7 +180,7 @@ def main():
                 print("your new account number is:", accountNumberGenerator(), "\nDo not share this number with anyone!")
                 print("Your minimum deposit will be $1000")
                 print("Enter amount to deposit: ")
-                newAccountDeposit()
+                writeFile('',newAccountDeposit())
                 break
             else:
                 print("Have a good day")
