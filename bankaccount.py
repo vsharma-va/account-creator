@@ -1,71 +1,151 @@
 from userClass import User
+import string
 import random
 
-registeredPins = [1234,3456,4567,5678,6789,7890]
+
+def openFile():
+    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'r') as file:
+        pins = file.readlines()
+    file.close()
+    return pins
+
+
+def writeFile(data):
+    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'r+') as file:
+        file.write(data)
+    file.close()
+
+
+def removePunctuation(pins):
+    punctuationMarks = string.punctuation
+    for i in pins:
+        if i == punctuationMarks:
+            pins.remove(i)
+    return pins
+
+
+def removeSpaces(pins):
+    cleanListPins = []
+    for z in pins:
+        cleanListPins.append(z.strip())
+    return cleanListPins
+
+
+def cleanListofPins():
+    cleanList = removeSpaces(removePunctuation(openFile()))
+    return cleanList
+
+
 def greetUser():
+    registeredPins = cleanListofPins()
     userInDataBase: bool = True
-    print("Welcome to Axis Bank\n")
     lenRegisteredPins = len(registeredPins)
-    pinNumber = int(input("please Enter your account Number: "))
-    for i in range(lenRegisteredPins - 1):
-        if registeredPins[i] == pinNumber: #Checks the input account number with registered accounts from the list
-            userInDataBase = True
-            break
-        if registeredPins[i] != pinNumber: #if no account number matches then the program asks the user to register
-            userInDataBase = False
-        
-    if userInDataBase:
-        print("Good day")
+    elementIndex = 0
+    chances = 3
+    print("Welcome to Axis Bank\n")
+
+    try:
+        registered = int(input('''Are you registered with us?
+press 1 for yes
+press 2 for no\n'''))
+    except TypeError:
+        print("Entered a string")
+    if registered == 1:
+        for i in range(chances):    
+            userName = input("Enter your registered name: ")
+            userPin = input("Enter your registered Pin: ")
+            for z in registeredPins:
+                search = userName + ' ' + userPin
+                if search == z:
+                    print("Welcome")
+                    userInDataBase = True
+                    break
+                elif search != z and elementIndex != lenRegisteredPins - 1:
+                    elementIndex += 1
+                    userInDataBase = False
+                elif elementIndex == lenRegisteredPins - 1:
+                    print("Your input doesn't match with our records " +
+                    " Either you are not registered with us or you have " +
+                    " Entered the wrong information " + " Please try again ")
+                    elementIndex = 0
+                    chances += 1
+    elif registered == 2:
+        print("would you like to register?")
+        userInDataBase = False
+    return userInDataBase
+
+
+def inputChecker(data: str, length, strict= 0):
+    if len(data) >= length and not strict == 1:
+        return True
+    elif strict == 1:
+        if len(data) == length:
+            return True
+        elif len(data) >= length:
+            return False
     else:
-        print("You are not a registered user")
-    return userInDataBase # returns bool value true if account number is in database else returns false
+        return False
 
 
 def registerAccount():
+    registeredPins = cleanListofPins()
+    correct: bool = False
+    enterNameAgain: bool = False
+    numberOfTries: int = 0 
     try:
-        wantsAccount = int(input("Press 1 to register a account "+"\nPress 2 to exit \n"))   #asks user if he/she wants to register an account
+        wantsAccount = int(input("Press 1 to register a account "+"\nPress 2 to exit \n"))  # asks user if he/she wants to register an account
     except TypeError:
-        print("You entered a string")                                                        #checks the value of wantsAccount
+        print("You entered a string")  # checks the value of wantsAccount
     if wantsAccount == 1:
-        firstName = input("Enter your first name: ")
-        lastName = input("Enter your last name: ")
-        correct:bool = False
-        while not correct:                                                                   #till correct is false it will keep asking the user to enter the password again
-            numberOfLetterChecker = 0                                                        #checks if the length of password is greater than 4
-            pin = (input("Enter your desired pin: "))
-            while len(pin) != 4:
-                print("your pin has to be 4 digits long")
-                pin = (input("Enter your desired Pin: "))
+        while not correct:
+            if enterNameAgain or numberOfTries == 0:
+                firstName = input("Enter your first name: ")
+                lastName = input("Enter your last name: ")
+                pin = input("Enter your desired Pin (Must be 4 integers): ")
+            else:
+                pin = input("Enter your desired Pin (Must be 4 integers): ")
 
+            if inputChecker(firstName, 2) and inputChecker(lastName, 2) and inputChecker(pin, 4, 1):
 
-            rePin = input("Please enter your pin again: ")                                   #asks user to confirm their pin
-            if not rePin == pin:                                                             #checks if the confirm pin is equal to their oin
-                 print("the two passwords dont match")
-            elif rePin == pin:
-                 correct = True
-                 registeredPins.append(pin)                                                  #if they both are equal then the pin is added to the registeredPins list
-        newUser = User(firstName, lastName, pin)                                             #fills the input to the User class in the file userClass.py in the same directory
-        newUser.describeUser()
-    else:
-        pass
-    return wantsAccount
+                rePin = input("Enter your pin again for conformation: ")
+                if rePin == pin:
+                    correct = True
+                    newUser = User(firstName, lastName, pin)  # fills the input to the User class in the file userClass.py in the same directory
+                    newUser.describeUser()
+                    userData = firstName + ' ' + pin
+                    registeredPins.append(userData)
+                    writeFile(userData)
+                    break
+                elif rePin != pin:
+                    print("The two pins don't match\n")
+                    enterNameAgain = False
+                    numberOfTries += 1
+
+            else:
+                print("Please input correct Info")
+                correct = False
+                enterNameAgain = True
+                numberOfTries += 1
+                continue
+    return correct
 
 
 def accountNumberGenerator():
     accountLength = 10
-    newAccountNumber = ""                                           # random account generator which cannot have 0 as the first digit
+    # random account generator which cannot have 0 as the first digit
+    newAccountNumber = ""
     for i in range(0, accountLength, 1):
         if i == 0:
-            digit = str(random.randint(1,9))
+            digit = str(random.randint(1, 9))
             newAccountNumber += digit
         else:
-            digit = str(random.randint(0,9))
+            digit = str(random.randint(0, 9))
             newAccountNumber += digit
     return int(newAccountNumber)
 
 
 def newAccountDeposit():
-    correctDeposit:bool = False
+    correctDeposit: bool = False
     while not correctDeposit:
         moneyDeposit = float(input())
         if moneyDeposit < 1000:
@@ -77,21 +157,24 @@ def newAccountDeposit():
 
 
 def main():
-    exit:bool = False
+    exit: bool = False
+    registeredUser: bool = greetUser()
     while not exit:
-        if not greetUser():
-            if registerAccount() == 1:
-                print("your new account number is:", accountNumberGenerator(),"\nDo not share this number with anyone!")
+        if not registeredUser:
+            if registerAccount():
+                print("your new account number is:", accountNumberGenerator(), "\nDo not share this number with anyone!")
                 print("Your minimum deposit will be $1000")
+                print("Enter amount to deposit: ")
                 newAccountDeposit()
                 break
             else:
                 print("Have a good day")
                 exit = True
                 break
-        elif greetUser():
-            print("Good day2")
+        elif registeredUser:
+            print("Good day")
             exit = True
             break
+
 
 main()
