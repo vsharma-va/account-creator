@@ -11,8 +11,9 @@ def openFile():
 
 
 def writeFile(data):
-    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'r+') as file:
-        file.write(data)
+    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'a') as file:
+        file.write('\n' + data)
+        
     file.close()
 
 
@@ -85,6 +86,10 @@ def inputChecker(data: str, length, strict= 0):
             return False
     else:
         return False
+
+
+
+    
 
 
 def registerAccount():
@@ -172,8 +177,6 @@ def main():
                 exit = True
                 break
         elif registeredUser:
-            print("Good day")
-            exit = True
             break
 
 
