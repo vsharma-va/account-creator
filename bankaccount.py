@@ -1,27 +1,55 @@
 from userClass import User
+import string
 import random
 
-registeredPins = [1234,3456,4567,5678,6789,7890]
+def openFile():
+    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'r') as file:
+        pins = file.readlines()
+    file.close()
+    print(pins)
+    return pins
+
+
+def writeFile(pinNumber):
+    with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'r+') as file:
+        file.write(pinNumber)
+    file.close()
+
+
+def removePunctuation(pins):
+    punctuationMarks = string.punctuation    
+    for i in pins:
+        if i == punctuationMarks:
+            pins.remove(i)
+    return pins
+
+def removeSpaces(pins):
+    cleanListPins = []
+    for z in pins:
+        cleanListPins.append(z.strip())
+    return cleanListPins
+
+def cleanListofPins():
+    cleanList = removeSpaces(removePunctuation(openFile()))        
+    return cleanList
+
 def greetUser():
+    registeredPins = cleanListofPins()
     userInDataBase: bool = True
     print("Welcome to Axis Bank\n")
     lenRegisteredPins = len(registeredPins)
     pinNumber = int(input("please Enter your account Number: "))
     for i in range(lenRegisteredPins - 1):
-        if registeredPins[i] == pinNumber: #Checks the input account number with registered accounts from the list
+        if int(registeredPins[i]) == pinNumber: #Checks the input account number with registered accounts from the list
             userInDataBase = True
             break
-        if registeredPins[i] != pinNumber: #if no account number matches then the program asks the user to register
+        if int(registeredPins[i]) != pinNumber: #if no account number matches then the program asks the user to register
             userInDataBase = False
-        
-    if userInDataBase:
-        print("Good day")
-    else:
-        print("You are not a registered user")
     return userInDataBase # returns bool value true if account number is in database else returns false
 
 
 def registerAccount():
+    registeredPins = cleanListofPins()
     try:
         wantsAccount = int(input("Press 1 to register a account "+"\nPress 2 to exit \n"))   #asks user if he/she wants to register an account
     except TypeError:
@@ -43,7 +71,8 @@ def registerAccount():
                  print("the two passwords dont match")
             elif rePin == pin:
                  correct = True
-                 registeredPins.append(pin)                                                  #if they both are equal then the pin is added to the registeredPins list
+                 writeFile(pin) 
+                                                        #if they both are equal then the pin is added to the registeredPins list
         newUser = User(firstName, lastName, pin)                                             #fills the input to the User class in the file userClass.py in the same directory
         newUser.describeUser()
     else:
@@ -78,8 +107,9 @@ def newAccountDeposit():
 
 def main():
     exit:bool = False
+    registeredUser: bool = greetUser()
     while not exit:
-        if not greetUser():
+        if not registeredUser:
             if registerAccount() == 1:
                 print("your new account number is:", accountNumberGenerator(),"\nDo not share this number with anyone!")
                 print("Your minimum deposit will be $1000")
@@ -89,8 +119,8 @@ def main():
                 print("Have a good day")
                 exit = True
                 break
-        elif greetUser():
-            print("Good day2")
+        elif registeredUser:
+            print("Good day")
             exit = True
             break
 
