@@ -29,12 +29,12 @@ def openBankBalance():
 def writeFile(data = '', balance = 0, position = 0, reWrite: bool = False):
     if data != '':
         with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\registeredPins.txt", 'a') as file:
-            file.write( data)
+            file.write(data+'\n')
         file.close()
 
     if balance != 0 and not reWrite:
         with open("L:\\Python Projects\\Updated Bank Program\\bankaccount\\bankaccount\\bankbalance.txt", 'a') as file:
-            file.write(str(balance))
+            file.write(str(balance)+'\n')
         file.close()
 
     elif balance != 0 and reWrite:
@@ -44,7 +44,6 @@ def writeFile(data = '', balance = 0, position = 0, reWrite: bool = False):
             accountBalance[position] = str(balance)
             for element in accountBalance:
                 file.write(element)
-                file.write('\n')
             
         file.close()
 
