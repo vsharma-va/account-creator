@@ -162,8 +162,8 @@ def registerAccount():
     return correct
 
 
-#input checker function thakes two parameters and one optional parameter
-#first parameter is the data whose length needs to be checker. Second parameter is the length, data should be equal or greater than
+#input checker function takes two parameters and one optional parameter
+#first parameter is the data whose length needs to be checked. Second parameter is the length, data should be equal or greater than.
 #Third parmeter if equal to one then the length of data must be equal to the second parameter
 def inputChecker(data: str, length, strict= 0):
     if len(data) >= length and not strict == 1:
